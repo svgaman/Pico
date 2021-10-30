@@ -96,7 +96,8 @@ class PicoTwigExtension extends Twig_Extension
         return array(
             'url_param' => new Twig_SimpleFunction('url_param', array($this, 'urlParamFunction')),
             'form_param' => new Twig_SimpleFunction('form_param', array($this, 'formParamFunction')),
-            'pages' => new Twig_SimpleFunction('pages', array($this, 'pagesFunction'))
+            'pages' => new Twig_SimpleFunction('pages', array($this, 'pagesFunction')),
+            'page_content' => new Twig_SimpleFunction('page_content', array($this, 'pageContentFunction'))
         );
     }
 
@@ -483,5 +484,20 @@ class PicoTwigExtension extends Twig_Extension
             ($depth !== null) ? $depth : INF,
             $depthOffset
         );
+    }
+
+    /**
+     * Returns page content
+     * @param string $pageName
+     * @return string
+     */
+    public function pageContentFunction($pageName)
+    {
+        $pages = $this->getPico()->getPages();
+        $pageData = $pages[$pageName];
+        $markdown = $this->getPico()->prepareFileContent($pageData['raw_content'], $pageData['meta']);
+        $pageData['content'] = $this->getPico()->parseFileContent($markdown);
+
+        return $pageData['content'];
     }
 }
